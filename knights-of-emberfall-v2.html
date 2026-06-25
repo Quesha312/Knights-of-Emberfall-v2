@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Knights of Emberfall II: The Two-Day Siege</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=Quicksand:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#2B1B12;
+  --parchment:#F2E4C2;
+  --parchment-dark:#E4D2A0;
+  --parchment-darker:#D4BD86;
+  --crimson:#8B2635;
+  --crimson-dark:#6B1C28;
+  --forest:#2F5233;
+  --royal:#2E4374;
+  --gold:#B8841F;
+  --gold-light:#E8B94A;
+  --ember:#C1440E;
+  --ember-light:#E8762F;
+  --ash:#6B6259;
+  --paper-shadow: rgba(43,27,18,0.25);
+  --radius: 10px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background: var(--parchment);
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(184,132,31,0.08), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(139,38,53,0.06), transparent 45%);
+  color:var(--ink);
+  font-family:'Lora', serif;
+  min-height:100vh;
+}
+h1,h2,h3,h4{font-family:'Cinzel', serif; margin:0 0 .4em 0; letter-spacing:.02em;}
+.ui{font-family:'Quicksand', sans-serif;}
+.mono{font-family:'JetBrains Mono', monospace;}
+#app{max-width:1100px; margin:0 auto; padding:24px 18px 60px;}
+
+.panel{
+  background:linear-gradient(180deg, #FBF3DD, var(--parchment));
+  border:2px solid var(--parchment-darker);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 18px var(--paper-shadow);
+  padding:28px;
+  margin-bottom:22px;
+  position:relative;
+}
+.panel::before{
+  content:"";
+  position:absolute; inset:6px;
+  border:1px solid rgba(43,27,18,0.12);
+  border-radius:6px;
+  pointer-events:none;
+}
+.eyebrow{
+  font-family:'Quicksand',sans-serif;
+  font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+  font-size:.72rem; color:var(--crimson);
+  margin-bottom:6px;
+}
+.center{text-align:center;}
+.muted{color:var(--ash);}
+.row{display:flex; gap:14px; flex-wrap:wrap;}
+.row.center{justify-content:center;}
+.row.between{justify-content:space-between; align-items:center;}
+.spacer{height:14px;}
+
+button{
+  font-family:'Quicksand',sans-serif;
+  font-weight:700;
+  font-size:1rem;
+  border:none;
+  border-radius:8px;
+  padding:13px 22px;
+  cursor:pointer;
+  transition: transform .1s ease, box-shadow .15s ease;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.18);
+}
+button:hover{transform:translateY(-2px);}
+button:active{transform:translateY(0px); box-shadow:0 1px 0 rgba(0,0,0,0.18);}
+button:focus-visible{outline:3px solid var(--royal); outline-offset:2px;}
+.btn-primary{background:var(--crimson); color:#FBF3DD;}
+.btn-primary:hover{background:var(--crimson-dark);}
+.btn-gold{background:var(--gold); color:#2B1B12;}
+.btn-gold:hover{background:var(--gold-light);}
+.btn-forest{background:var(--forest); color:#F2E4C2;}
+.btn-ghost{background:transparent; color:var(--ink); border:2px solid var(--parchment-darker); box-shadow:none;}
+.btn-ghost:hover{background:var(--parchment-dark);}
+.btn-small{padding:8px 14px; font-size:.85rem;}
+button:disabled{opacity:.45; cursor:not-allowed; transform:none;}
+button:disabled:hover{transform:none;}
+
+input, select, textarea{
+  font-family:'Quicksand',sans-serif;
+  font-size:1rem;
+  padding:11px 14px;
+  border:2px solid var(--parchment-darker);
+  border-radius:8px;
+  background:#FBF3DD;
+  color:var(--ink);
+  width:100%;
+}
+input:focus, select:focus, textarea:focus{outline:3px solid var(--royal); outline-offset:1px;}
+label{font-family:'Quicksand',sans-serif; font-weight:600; font-size:.85rem; color:var(--ash); display:block; margin-bottom:5px;}
+
+.crest{font-size:3.4rem; text-align:center; margin-bottom:4px;}
+.title-main{font-size:2.2rem; text-align:center; color:var(--crimson);}
+.title-sub{font-size:1rem; text-align:center; color:var(--ash); font-style:italic; margin-bottom:28px; font-family:'Lora',serif;}
+.choice-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+@media (max-width:640px){.choice-grid{grid-template-columns:1fr;}}
+.choice-card{
+  background:#FBF3DD; border:2px solid var(--parchment-darker); border-radius:var(--radius);
+  padding:26px; text-align:center; cursor:pointer; transition:.15s;
+}
+.choice-card:hover{border-color:var(--gold); transform:translateY(-3px); box-shadow:0 8px 16px var(--paper-shadow);}
+.choice-card .icon{font-size:2.4rem; margin-bottom:8px;}
+
+.room-code-display{
+  font-family:'JetBrains Mono', monospace; font-weight:700; font-size:2.6rem;
+  text-align:center; letter-spacing:.1em; color:var(--crimson);
+  background:#FBF3DD; border:3px dashed var(--gold); border-radius:12px;
+  padding:18px; margin:18px 0;
+}
+
+.dragon-track{
+  position:relative; display:flex; align-items:center; gap:0;
+  padding:18px 10px 26px; margin-bottom:6px;
+}
+.dragon-track .path{
+  position:absolute; left:24px; right:24px; top:42px; height:4px;
+  background:var(--parchment-darker); border-radius:2px; z-index:0;
+}
+.dragon-track .path-fill{
+  position:absolute; left:24px; top:42px; height:4px; background:var(--ember);
+  border-radius:2px; z-index:1; transition: width .6s ease;
+}
+.dragon-step{
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; z-index:2; position:relative;
+}
+.flame-node{
+  width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  background:#FBF3DD; border:3px solid var(--parchment-darker); font-size:1.1rem; transition:.4s;
+}
+.flame-node.active{border-color:var(--ember); background:var(--ember-light); box-shadow:0 0 14px rgba(193,68,14,0.5);}
+.flame-node.passed{border-color:var(--ember); background:var(--ember);}
+.dragon-step .lvl-label{font-family:'Quicksand',sans-serif; font-size:.65rem; color:var(--ash); font-weight:600;}
+.dragon-banner{
+  text-align:center; font-family:'Quicksand',sans-serif; font-weight:700; color:var(--ember); font-size:.95rem; margin-top:6px;
+}
+
+.role-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
+@media (max-width:760px){.role-grid{grid-template-columns:repeat(2,1fr);}}
+.role-card{
+  background:#FBF3DD; border:2px solid var(--parchment-darker); border-radius:10px;
+  padding:14px 10px; text-align:center; cursor:pointer; transition:.15s; position:relative;
+}
+.role-card:hover:not(.taken){transform:translateY(-2px); box-shadow:0 6px 12px var(--paper-shadow);}
+.role-card.taken{opacity:.4; cursor:not-allowed;}
+.role-card .r-icon{font-size:1.8rem;}
+.role-card .r-name{font-family:'Cinzel',serif; font-weight:700; font-size:.9rem; margin-top:4px;}
+.role-card .r-title{font-family:'Quicksand',sans-serif; font-size:.7rem; color:var(--ash);}
+.role-card .taken-tag{
+  position:absolute; top:6px; right:6px; background:var(--crimson); color:#fff; font-size:.6rem;
+  padding:2px 6px; border-radius:6px; font-family:'Quicksand',sans-serif; font-weight:700;
+}
+.role-pill{
+  display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:20px;
+  font-family:'Quicksand',sans-serif; font-weight:700; font-size:.85rem; color:#fff;
+}
+
+.script-line{
+  display:flex; gap:14px; padding:12px 14px; border-radius:8px; margin-bottom:8px;
+  opacity:.6; transition:.2s; align-items:flex-start; flex-wrap:wrap;
+}
+.script-line.mine{
+  opacity:1; background:#FCE9B8; border:2px solid var(--gold);
+}
+.script-line .speaker-tag{
+  flex:0 0 130px; font-family:'Cinzel',serif; font-weight:700; font-size:.85rem; padding-top:2px;
+}
+.script-line .line-text{font-family:'Lora',serif; font-size:1.08rem; line-height:1.55; flex:1;}
+.your-line-flag{
+  font-family:'Quicksand',sans-serif; font-weight:700; font-size:.72rem; color:var(--crimson);
+  text-transform:uppercase; letter-spacing:.05em; margin-bottom:2px; display:block;
+}
+.line-num{
+  flex:0 0 30px; font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--ash); padding-top:3px;
+}
+.assign-select{flex:0 0 150px; padding:6px 8px; font-size:.8rem;}
+.my-lines-banner{
+  background:var(--gold); color:#2B1B12; border-radius:8px; padding:10px 16px; margin-bottom:14px;
+  font-family:'Quicksand',sans-serif; font-weight:700; text-align:center;
+}
+
+.overlay{
+  position:fixed; inset:0; background:rgba(43,27,18,0.6); z-index:50;
+  display:flex; align-items:center; justify-content:center; padding:18px;
+}
+.challenge-card{
+  background:var(--parchment); border:3px solid var(--gold); border-radius:14px;
+  max-width:560px; width:100%; padding:30px; box-shadow:0 20px 50px rgba(0,0,0,.4);
+  max-height:90vh; overflow-y:auto;
+}
+.answer-key{
+  background:#FDEAEA; border:2px dashed var(--crimson); border-radius:8px; padding:14px; margin-top:16px;
+  color:var(--crimson-dark); font-family:'Quicksand',sans-serif; font-weight:700;
+}
+.type-badge{
+  display:inline-block; font-family:'Quicksand',sans-serif; font-weight:700; font-size:.7rem;
+  text-transform:uppercase; letter-spacing:.06em; padding:3px 10px; border-radius:12px; margin-bottom:10px;
+}
+.type-phonics{background:#DCE9DC; color:var(--forest);}
+.type-morphology{background:#E0E3F0; color:var(--royal);}
+.type-math{background:#F0E0D0; color:var(--ember);}
+.type-reading{background:#F0E0E6; color:var(--crimson);}
+.type-logic{background:#F2E4C2; color:var(--gold);}
+.choice-list{display:flex; flex-direction:column; gap:8px; margin-top:10px;}
+.choice-opt{
+  background:#FBF3DD; border:2px solid var(--parchment-darker); border-radius:8px; padding:12px 14px;
+  cursor:pointer; font-family:'Quicksand',sans-serif; font-weight:600; text-align:left;
+}
+.choice-opt:hover{border-color:var(--gold);}
+.choice-opt.picked{border-color:var(--royal); background:#E0E3F0;}
+
+.flip-card-wrap{ display:flex; justify-content:center; padding:10px 0; }
+.flip-card{ width:220px; height:300px; perspective:1000px; }
+.flip-inner{ width:100%; height:100%; position:relative; transform-style:preserve-3d; animation: flipIn .7s cubic-bezier(.4,.2,.2,1); }
+@keyframes flipIn{ from{transform:rotateY(180deg);} to{transform:rotateY(0deg);} }
+.flip-face{
+  position:absolute; inset:0; border-radius:12px; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; padding:16px; text-align:center;
+  backface-visibility:hidden; border:3px solid;
+}
+.flip-face.valor{ background:linear-gradient(160deg,#FCE9B8,#F2D483); border-color:var(--gold); }
+.flip-face.setback{ background:linear-gradient(160deg,#E8C9C9,#D89B9B); border-color:var(--crimson); }
+.flip-face .f-icon{font-size:2.6rem; margin-bottom:8px;}
+.flip-face .f-name{font-family:'Cinzel',serif; font-weight:700; font-size:1.1rem; margin-bottom:6px;}
+.flip-face .f-desc{font-family:'Quicksand',sans-serif; font-size:.85rem; color:var(--ink);}
+
+.tab-bar{display:flex; gap:6px; margin-bottom:18px; flex-wrap:wrap;}
+.tab-btn{
+  background:var(--parchment-dark); color:var(--ink); border:2px solid transparent; box-shadow:none;
+  padding:9px 16px; font-size:.85rem;
+}
+.tab-btn.active{background:var(--crimson); color:#FBF3DD;}
+
+.statusbar{
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
+  background:#FBF3DD; border:2px solid var(--parchment-darker); border-radius:10px; padding:12px 18px; margin-bottom:18px;
+}
+.stat{font-family:'Quicksand',sans-serif; font-weight:700; font-size:.9rem;}
+.stat .v{color:var(--crimson); font-size:1.1rem;}
+
+.linklike{background:none;border:none;box-shadow:none;color:var(--royal);text-decoration:underline;padding:4px 6px;font-weight:700;}
+.linklike:hover{transform:none; color:var(--crimson);}
+
+.banner-strip{
+  background:var(--crimson); color:#FBF3DD; text-align:center; padding:8px 14px; border-radius:8px;
+  font-family:'Quicksand',sans-serif; font-weight:700; margin-bottom:16px; font-size:.9rem;
+}
+.day-divider{ text-align:center; margin:30px 0; position:relative; }
+.day-divider span{
+  background:var(--parchment); padding:0 16px; font-family:'Cinzel',serif; font-weight:700; color:var(--gold);
+  position:relative; z-index:1;
+}
+.day-divider::before{ content:""; position:absolute; left:0; right:0; top:50%; height:2px; background:var(--parchment-darker); }
+
+.leaderboard-row{
+  display:flex; align-items:center; gap:14px; padding:12px 16px; border-radius:8px; margin-bottom:8px;
+  background:#FBF3DD; border:2px solid var(--parchment-darker);
+}
+.leaderboard-row.first{border-color:var(--gold); background:#FCE9B8;}
+.lb-rank{font-family:'Cinzel',serif; font-weight:900; font-size:1.3rem; color:var(--crimson); flex:0 0 36px;}
+.lb-name{font-family:'Quicksand',sans-serif; font-weight:700; flex:1;}
+.lb-pts{font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--forest); font-size:1.1rem;}
+.lb-role-icon{font-size:1.4rem;}
+
+.roster-card{
+  background:#FBF3DD; border:2px solid var(--parchment-darker); border-radius:10px; padding:14px; margin-bottom:8px;
+  display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+}
+.sync-dot{display:inline-block; width:9px; height:9px; border-radius:50%; background:var(--forest); margin-right:6px;}
+.sync-dot.off{background:var(--crimson);}
+.pause-banner{
+  background:var(--royal); color:#fff; text-align:center; padding:10px 14px; border-radius:8px;
+  font-family:'Quicksand',sans-serif; font-weight:700; margin-bottom:16px;
+}
+</style>
+</head>
+<body>
+<div id="app">Loading the castle gates...</div>
+
+<script>
+/* =========================================================
+   ROLES
+========================================================= */
+const ROLES = [
+  {id:'elara',   name:'Princess Elara', title:'Heir to the Realm',  icon:'\uD83D\uDC51', color:'#B8841F'},
+  {id:'cedric',  name:'Sir Cedric',     title:'Knight Captain',     icon:'\u2694\uFE0F',  color:'#8B2635'},
+  {id:'wren',    name:'Wren',           title:'Royal Scout',        icon:'\uD83C\uDFF9', color:'#2F5233'},
+  {id:'maren',   name:'Maren',          title:'Court Mage',         icon:'\uD83D\uDD2E', color:'#2E4374'},
+  {id:'tobin',   name:'Tobin',          title:'Master Blacksmith',  icon:'\uD83D\uDD28', color:'#A85A20'},
+  {id:'nan',     name:'Old Nan',        title:'Royal Healer',       icon:'\uD83C\uDF3F', color:'#3C6E47'},
+  {id:'garrick', name:'Garrick',        title:'Stable Master',      icon:'\uD83D\uDC0E', color:'#6B4423'},
+  {id:'pip',     name:'Pip',            title:'Royal Messenger',    icon:'\uD83D\uDCEF', color:'#1F7A7A'},
+];
+function roleById(id){ return ROLES.find(r=>r.id===id); }
+
+/* =========================================================
+   CHAPTERS  (script lines kept short + simple for 2nd-grade
+   decoding; challenge content carries the 4th-grade thinking)
+========================================================= */
+const CHAPTERS = [
+  // ---------------- DAY 1 ----------------
+  {
+    day:1, title:"The Bell Rings", dragonLevel:1, block:'Phonics',
+    challengeType:'phonics',
+    script:[
+      {r:'pip',    t:"Hear ye! The old bell rings. It has not rung in one hundred years!"},
+      {r:'garrick',t:"I saw red smoke on the hill. It rose up like a flame."},
+      {r:'elara',  t:"The old tales said a dragon sleeps under that hill. Vorrak is his name."},
+      {r:'cedric', t:"Our walls are strong. We will not run. We will stand and hold the gate."},
+      {r:'maren',  t:"Walls will not stop a dragon. I will need time to cast a spell."},
+      {r:'wren',   t:"Let me scout the hill at dawn. I will bring back the truth."},
+    ],
+    challenge:{
+      type:'phonics',
+      q:"Look at the word GLEAM. It has the vowel team 'ea', which makes one long /ee/ sound. Which word below has that same long /ee/ sound spelled with 'ea'?",
+      choices:["smoke","dream","bell","rang"],
+      answerIndex:1,
+      hint:"Say each word slowly. Listen for the long /ee/ sound."
+    },
+    closing:[
+      {r:'wren',  t:"At dawn I go. Watch the gate while I am gone."},
+      {r:'elara', t:"Go safe, Wren. We will be ready when you return."},
+    ]
+  },
+  {
+    day:1, title:"Counting the Guard", dragonLevel:2, block:'Math',
+    challengeType:'math',
+    script:[
+      {r:'tobin', t:"Captain, how many soldiers stand at the wall right now?"},
+      {r:'cedric', t:"We have 36 soldiers on the wall. 18 more rest in the hall."},
+      {r:'tobin', t:"Call them all. We need every shield we have."},
+      {r:'nan',   t:"Then I will count my herbs too, in case any knight is hurt."},
+      {r:'elara', t:"Tell me the full number, Tobin, so I know our strength."},
+    ],
+    challenge:{
+      type:'math',
+      q:"36 soldiers are on the wall. 18 more soldiers join them from the hall. How many soldiers are there in all?",
+      accept:["54"],
+      hint:"Add 36 + 18. Try breaking 18 into 10 + 8."
+    },
+    closing:[
+      {r:'tobin', t:"54 strong. That is our number tonight."},
+      {r:'cedric',t:"Good. Now we wait for Wren's report."},
+    ]
+  },
+  {
+    day:1, title:"Wren's Find", dragonLevel:3, block:'Reading',
+    challengeType:'reading',
+    script:[
+      {r:'wren',   t:"I am back! I found tracks in the woods. Boot tracks, not claw tracks."},
+      {r:'garrick',t:"Boots? That means a person, not the dragon!"},
+      {r:'wren',   t:"I found a camp too. There was an empty cage, big enough for a dragon."},
+      {r:'maren',  t:"A cage built for Vorrak? Someone plans to capture him, not fight him."},
+      {r:'elara',  t:"Who would dare such a thing? Did you see a name, Wren?"},
+      {r:'wren',   t:"A banner. Black, with a red wolf. The mark of Lord Mortane."},
+    ],
+    challenge:{
+      type:'reading',
+      q:"Use clues from the story to answer: Why does Wren think a PERSON is involved, not just the dragon? Use two clues from the story in your answer.",
+      keywords:[["boot","tracks"],["cage","camp"]],
+      modelAnswer:"Wren found boot tracks (not claw tracks) and an empty cage built for a dragon, plus a banner with Lord Mortane's mark.",
+      hint:"Think about what kind of tracks Wren found, and what was at the camp."
+    },
+    closing:[
+      {r:'cedric', t:"Mortane. He has wanted Emberfall's throne for years."},
+      {r:'elara',  t:"Then he means to use the dragon as a weapon against us."},
+    ]
+  },
+  // ---------------- DAY 2 ----------------
+  {
+    day:2, title:"Root Words of the Realm", dragonLevel:4, block:'Morphology',
+    challengeType:'morphology',
+    script:[
+      {r:'maren', t:"I have studied old scrolls all night. I must REREAD them once more."},
+      {r:'nan',   t:"Reread? Why read a thing twice?"},
+      {r:'maren', t:"The prefix RE- means 'again.' I must look again to be sure of the spell."},
+      {r:'tobin', t:"Then UNLOCK the old vault, Maren. The binding stones are inside."},
+      {r:'elara', t:"UN- means 'not' or 'opposite.' To unlock means to open what was locked."},
+    ],
+    challenge:{
+      type:'morphology',
+      q:"The prefix RE- means 'again.' Which word means 'to build something AGAIN'?",
+      choices:["rebuild","unbuild","builder","building"],
+      answerIndex:0,
+      hint:"Look for the word that starts with RE- and means to do the action a second time."
+    },
+    closing:[
+      {r:'maren', t:"The binding spell is ready. We have what we need."},
+      {r:'elara', t:"Then let us gather what else this castle can give."},
+    ]
+  },
+  {
+    day:2, title:"The Flower Count", dragonLevel:5, block:'Math',
+    challengeType:'math',
+    script:[
+      {r:'nan',    t:"I gathered 24 moonflowers from the hidden grove."},
+      {r:'garrick',t:"What are they for, Old Nan?"},
+      {r:'nan',    t:"Moonflower calms a dragon's rage. I must split them into 4 equal pouches."},
+      {r:'pip',    t:"How many flowers go in each pouch?"},
+      {r:'nan',    t:"Help me find the number, before Vorrak wakes."},
+    ],
+    challenge:{
+      type:'math',
+      q:"Old Nan has 24 moonflowers. She splits them evenly into 4 pouches. How many moonflowers are in each pouch?",
+      accept:["6"],
+      hint:"Divide 24 by 4."
+    },
+    closing:[
+      {r:'nan',   t:"6 flowers in each pouch. Now we are ready."},
+      {r:'cedric',t:"Then it is time to choose our gate."},
+    ]
+  },
+  {
+    day:2, title:"The Final Stand", dragonLevel:6, block:'Logic', doublePoints:true,
+    challengeType:'logic',
+    script:[
+      {r:'wren',   t:"Mortane's wagons were wide and heavy. Built to carry something big."},
+      {r:'tobin',  t:"The western road is the only road wide enough for big siege towers."},
+      {r:'elara',  t:"Then which gate should we guard, Sir Cedric? Use what we know."},
+      {r:'cedric', t:"Tell me the whole story, from the bell to this moment. Then we will know."},
+    ],
+    challenge:{
+      type:'logic',
+      q:"Put it all together: (1) What warned Emberfall that something was wrong? (2) What did Wren find that proved a PERSON was behind it? (3) How many soldiers did they count in all? (4) How many moonflowers went in each pouch? (5) Which gate should they guard, and WHY (use the wagon clue)?",
+      keywords:[["bell","smoke"],["boot","cage"],["54"],["6"],["western","wagon"]],
+      modelAnswer:"(1) The bell rang and red smoke rose from the mountain. (2) Wren found boot tracks and an empty cage, proving Lord Mortane was involved. (3) 54 soldiers in all. (4) 6 moonflowers in each pouch. (5) The western gate, because Mortane's wide, heavy wagons could only fit through the western road.",
+      hint:"Walk back through each chapter, in order, like turning the pages of the story."
+    },
+    closing:[
+      {r:'cedric', t:"The western gate. Move every shield there before nightfall."},
+      {r:'elara',  t:"Then let the storm come. Emberfall is ready."},
+    ]
+  },
+];
+
+/* =========================================================
+   POWER-UPS (Valor) & OBSTACLES (Setback)
+========================================================= */
+const VALOR_CARDS = [
+  {name:"Dragonscale Shield", icon:"\uD83D\uDEE1\uFE0F", desc:"Blocks the next Obstacle Card your class draws."},
+  {name:"Knight's Resolve", icon:"\u2694\uFE0F", desc:"Earn 1 extra point right now."},
+  {name:"Scout's Keen Eye", icon:"\uD83C\uDFF9", desc:"See the title of the next chapter early."},
+  {name:"Healer's Tonic", icon:"\uD83E\uDDEA", desc:"Undo the last Obstacle Card."},
+  {name:"Blacksmith's Masterwork", icon:"\uD83D\uDD28", desc:"Double the points earned this round."},
+  {name:"Court Mage's Ward", icon:"\uD83D\uDD2E", desc:"The Dragon Tracker will not move this round, even on a wrong answer."},
+  {name:"Bard's Tale", icon:"\uD83C\uDFB6", desc:"Award 1 bonus point for the best reading-aloud performance."},
+  {name:"Royal Favor", icon:"\uD83D\uDC51", desc:"Choose who answers the next challenge."},
+  {name:"Banner of Emberfall", icon:"\uD83C\uDFF4", desc:"Every player gains 1 point."},
+  {name:"Moonflower Blessing", icon:"\uD83C\uDF38", desc:"Push the Dragon Tracker back by 1 level."},
+];
+const SETBACK_CARDS = [
+  {name:"Broken Wagon Wheel", icon:"\uD83D\uDED1", desc:"Lose 1 point."},
+  {name:"Fog of the Marsh", icon:"\uD83C\uDF2B\uFE0F", desc:"The Dragon Tracker advances 1 extra level."},
+  {name:"Rumor and Panic", icon:"\uD83D\uDDE3\uFE0F", desc:"Skip the next bonus round."},
+  {name:"Lost Map", icon:"\uD83D\uDDFA\uFE0F", desc:"The Dragon Tracker advances immediately."},
+  {name:"Whispers of Doubt", icon:"\uD83D\uDC7B", desc:"Lose 1 point. No bonus this round."},
+];
+
+/* =========================================================
+   STORAGE / SYNC  (shared, cross-device)
+========================================================= */
+const STORAGE_PREFIX = 'koe2-room-';
+async function saveRoom(code, state){
+  try{
+    await window.storage.set(STORAGE_PREFIX + code, JSON.stringify(state), true);
+    return true;
+  }catch(e){ console.error('save failed', e); return false; }
+}
+async function loadRoom(code){
+  try{
+    const res = await window.storage.get(STORAGE_PREFIX + code, true);
+    return res ? JSON.parse(res.value) : null;
+  }catch(e){ return null; }
+}
+
+/* =========================================================
+   STATE
+========================================================= */
+let view = 'landing';
+let role = null;
+let roomCode = null;
+let pollTimer = null;
+let connected = false;
+
+function freshGame(){
+  return {
+    chapterIndex: 0,
+    dragonLevel: 0,
+    students: [],          // {name, roleId, points}
+    lineAssignments: {},   // {chapterIndex: {lineIndex: studentName}}
+    challengeActive: false,
+    submissions: {},       // {studentName: {text, ts, correct}}
+    lastResult: null,
+    cardShown: null,
+    paused: false,
+    log: [],
+    rev: 0,
+  };
+}
+let game = freshGame();
+let me = { name:'', roleId:null };
+let teacherDashTab = 'play';
+let pickedChoiceIndex = null;
+
+/* =========================================================
+   HELPERS
+========================================================= */
+function genRoomCode(){
+  const letters = 'BCDFGHJKLMNPQRSTVWXYZ';
+  let code = '';
+  for(let i=0;i<3;i++) code += letters[Math.floor(Math.random()*letters.length)];
+  code += '-' + Math.floor(100+Math.random()*900);
+  return code;
+}
+function norm(s){ return (s||'').toLowerCase().trim().replace(/[^a-z0-9\s]/g,''); }
+function studentByName(name){ return game.students.find(s=>s.name===name); }
+
+async function startPolling(){
+  if(pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(async ()=>{
+    const remote = await loadRoom(roomCode);
+    if(remote && remote.rev !== game.rev){
+      game = remote;
+      connected = true;
+      render();
+    } else if(remote){
+      connected = true;
+    }
+  }, 1800);
+}
+async function pushState(){
+  game.rev = (game.rev||0) + 1;
+  await saveRoom(roomCode, game);
+  render();
+}
+
+/* =========================================================
+   TEACHER ACTIONS
+========================================================= */
+async function teacherCreateRoom(){
+  role = 'teacher';
+  roomCode = genRoomCode();
+  game = freshGame();
+  await saveRoom(roomCode, game);
+  view = 'teacher-dash';
+  startPolling();
+  render();
+}
+function assignLine(chapterIdx, lineIdx, studentName){
+  if(!game.lineAssignments[chapterIdx]) game.lineAssignments[chapterIdx] = {};
+  if(studentName === '') delete game.lineAssignments[chapterIdx][lineIdx];
+  else game.lineAssignments[chapterIdx][lineIdx] = studentName;
+  pushState();
+}
+function triggerChallenge(){
+  game.challengeActive = true;
+  game.submissions = {};
+  game.lastResult = null;
+  pushState();
+}
+function gradeSubmission(studentName, isCorrect){
+  const chapter = CHAPTERS[game.chapterIndex];
+  const sub = game.submissions[studentName];
+  if(!sub) return;
+  sub.correct = isCorrect;
+  const student = studentByName(studentName);
+  if(student){
+    let pts = isCorrect ? 10 : 0;
+    if(isCorrect && chapter.doublePoints) pts = 20;
+    student.points = (student.points||0) + pts;
+  }
+  if(isCorrect){
+    game.lastResult = 'correct';
+    drawCard('valor');
+  } else {
+    game.lastResult = 'incorrect';
+    game.dragonLevel = Math.min(6, game.dragonLevel + 1);
+    drawCard('setback');
+  }
+  pushState();
+}
+function drawCard(kind){
+  const deck = kind==='valor' ? VALOR_CARDS : SETBACK_CARDS;
+  const card = deck[Math.floor(Math.random()*deck.length)];
+  game.cardShown = {kind, card};
+}
+function advanceChapter(){
+  game.chapterIndex = Math.min(CHAPTERS.length-1, game.chapterIndex+1);
+  game.dragonLevel = CHAPTERS[game.chapterIndex].dragonLevel;
+  game.challengeActive = false;
+  game.submissions = {};
+  game.lastResult = null;
+  game.cardShown = null;
+  pushState();
+}
+function jumpToChapter(idx){
+  game.chapterIndex = idx;
+  game.dragonLevel = CHAPTERS[idx].dragonLevel;
+  game.challengeActive = false;
+  game.submissions = {};
+  game.lastResult = null;
+  game.cardShown = null;
+  pushState();
+}
+function togglePause(){
+  game.paused = !game.paused;
+  pushState();
+}
+function resetGame(){
+  if(!confirm('Reset the whole game? This clears all points and progress.')) return;
+  const students = game.students.map(s=>({...s, points:0}));
+  game = freshGame();
+  game.students = students;
+  pushState();
+}
+
+/* =========================================================
+   STUDENT ACTIONS
+========================================================= */
+async function studentJoinRoom(code, name){
+  const remote = await loadRoom(code);
+  if(!remote){ alert("That room code wasn't found. Check with your teacher."); return; }
+  roomCode = code;
+  role = 'student';
+  game = remote;
+  me.name = name;
+  const existing = game.students.find(s=>s.name.toLowerCase()===name.toLowerCase());
+  if(existing){ me.roleId = existing.roleId; view = me.roleId ? 'student-view' : 'student-role'; }
+  else { view = 'student-role'; }
+  startPolling();
+  render();
+}
+async function studentPickRole(roleId){
+  const taken = game.students.some(s=>s.roleId===roleId);
+  if(taken) return;
+  game.students.push({name: me.name, roleId, points:0});
+  me.roleId = roleId;
+  view = 'student-view';
+  await pushState();
+}
+async function studentSubmit(text){
+  game.submissions[me.name] = {text, ts: Date.now(), correct:null};
+  await pushState();
+}
+
+/* =========================================================
+   RENDER HELPERS
+========================================================= */
+function dragonTrackHTML(level){
+  const pct = (Math.min(level,6)/6)*100;
+  let nodes = '';
+  for(let i=1;i<=6;i++){
+    const cls = i < level ? 'passed' : (i===level ? 'active' : '');
+    nodes += `<div class="dragon-step">
+      <div class="flame-node ${cls}">${i<=level?'\uD83D\uDD25':'\u2014'}</div>
+      <div class="lvl-label">Lvl ${i}</div>
+    </div>`;
+  }
+  return `<div class="eyebrow center">The Dragon's Approach</div>
+    <div class="dragon-track">
+      <div class="path"></div>
+      <div class="path-fill" style="width:${pct}%"></div>
+      ${nodes}
+    </div>
+    ${level>=6?'<div class="dragon-banner">\uD83D\uDC09 Vorrak nears the gates!</div>':''}`;
+}
+function rolePillHTML(roleId){
+  const r = roleById(roleId);
+  if(!r) return '';
+  return `<span class="role-pill" style="background:${r.color}">${r.icon} ${r.name}</span>`;
+}
+function scriptLineHTML(line, idx, chapterIdx, editable){
+  const r = roleById(line.r);
+  const assigned = (game.lineAssignments[chapterIdx]||{})[idx];
+  const isMine = role==='student' && assigned === me.name;
+  let assignWidget = '';
+  if(editable){
+    const opts = game.students.map(s=>`<option value="${s.name}" ${assigned===s.name?'selected':''}>${s.name}</option>`).join('');
+    assignWidget = `<select class="assign-select ui" data-chapter="${chapterIdx}" data-line="${idx}">
+      <option value="">(unassigned)</option>${opts}
+    </select>`;
+  }
+  return `<div class="script-line ${isMine?'mine':''}">
+    <div class="line-num">${idx+1}.</div>
+    <div class="speaker-tag" style="color:${r.color}">${r.icon} ${r.name}</div>
+    <div class="line-text">
+      ${isMine?'<span class="your-line-flag">\u2B50 Your Line!</span>':''}
+      ${assigned?`<span class="muted ui" style="font-size:.75rem;">(${assigned})</span><br>`:''}
+      ${line.t}
+    </div>
+    ${assignWidget}
+  </div>`;
+}
+function challengeOverlay(isTeacher){
+  const chapter = CHAPTERS[game.chapterIndex];
+  const ch = chapter.challenge;
+  const typeLabel = {phonics:'Phonics',morphology:'Morphology',math:'Math',reading:'Reading',logic:'Logic & Critical Thinking'}[ch.type];
+  let body = '';
+  if(ch.type==='phonics' || ch.type==='morphology'){
+    body = `<div class="choice-list">
+      ${ch.choices.map((c,i)=>`<button class="choice-opt ${pickedChoiceIndex===i?'picked':''}" data-choice="${i}">${c}</button>`).join('')}
+    </div>
+    <div class="spacer"></div>
+    <button class="btn-primary" id="btn-submit-choice" style="width:100%;" ${pickedChoiceIndex===null?'disabled':''}>Lock In Answer</button>`;
+  } else {
+    body = `<textarea id="student-answer" rows="3" placeholder="Type your answer here..."></textarea>
+    <div class="spacer"></div>
+    <button class="btn-primary" id="btn-submit-answer" style="width:100%;">Submit Answer</button>`;
+  }
+  const mySub = role==='student' ? game.submissions[me.name] : null;
+  return `<div class="overlay">
+    <div class="challenge-card">
+      <span class="type-badge type-${ch.type}">${typeLabel}</span>
+      <h3>${chapter.title}</h3>
+      <p>${ch.q}</p>
+      ${role==='student' && !mySub ? body : ''}
+      ${role==='student' && mySub ? `<p class="muted">You answered: <strong>${mySub.text}</strong> &mdash; waiting on your teacher to check it.</p>` : ''}
+      ${isTeacher ? teacherChallengeReview(chapter, ch) : ''}
+      ${ch.hint ? `<p class="muted" style="margin-top:14px;"><em>\uD83D\uDCA1 Hint: ${ch.hint}</em></p>` : ''}
+    </div>
+  </div>`;
+}
+function teacherChallengeReview(chapter, ch){
+  const rows = Object.entries(game.submissions).map(([name, sub])=>{
+    const student = studentByName(name);
+    let autoTag = '';
+    if(ch.type==='phonics' || ch.type==='morphology'){
+      const correct = parseInt(sub.text) === ch.answerIndex;
+      autoTag = correct ? '<span style="color:var(--forest);font-weight:700;">auto: correct</span>' : '<span style="color:var(--crimson);font-weight:700;">auto: incorrect</span>';
+    } else if(ch.type==='math'){
+      const correct = ch.accept.includes(norm(sub.text));
+      autoTag = correct ? '<span style="color:var(--forest);font-weight:700;">auto: correct</span>' : '<span style="color:var(--crimson);font-weight:700;">auto: check this one</span>';
+    } else {
+      autoTag = '<span class="muted">teacher judgment needed</span>';
+    }
+    const displayText = (ch.type==='phonics'||ch.type==='morphology') ? ch.choices[parseInt(sub.text)] : sub.text;
+    return `<div class="roster-card">
+      <strong>${name}</strong> <span class="muted">(${roleById(student?.roleId)?.name||'?'})</span>
+      <span class="ui" style="flex:1;">${displayText}</span>
+      ${autoTag}
+      ${sub.correct===null ? `
+        <button class="btn-forest btn-small" data-grade-correct="${name}">\u2713 Correct</button>
+        <button class="btn-ghost btn-small" data-grade-incorrect="${name}">\u2717 Incorrect</button>
+      ` : `<span>${sub.correct ? '\u2705':'\u274C'}</span>`}
+    </div>`;
+  }).join('') || '<p class="muted">No answers submitted yet.</p>';
+  return `<div class="spacer"></div><h4>Teacher Review</h4>${rows}
+    ${ch.modelAnswer ? `<div class="answer-key">Model answer: ${ch.modelAnswer}</div>` : ch.accept ? `<div class="answer-key">Accepted answer: ${ch.accept.join(' / ')}</div>` : ''}
+  `;
+}
+function cardFlipOverlay(){
+  const {kind, card} = game.cardShown;
+  return `<div class="overlay">
+    <div style="text-align:center;">
+      <div class="flip-card-wrap">
+        <div class="flip-card"><div class="flip-inner">
+          <div class="flip-face ${kind}">
+            <div class="f-icon">${card.icon}</div>
+            <div class="f-name">${card.name}</div>
+            <div class="f-desc">${card.desc}</div>
+          </div>
+        </div></div>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn-gold" id="btn-dismiss-card">Continue</button>
+    </div>
+  </div>`;
+}
+function leaderboardHTML(){
+  const sorted = [...game.students].sort((a,b)=>(b.points||0)-(a.points||0));
+  if(sorted.length===0) return '<p class="muted">No players yet.</p>';
+  return sorted.map((s,i)=>{
+    const r = roleById(s.roleId);
+    return `<div class="leaderboard-row ${i===0?'first':''}">
+      <div class="lb-rank">${i+1}</div>
+      <div class="lb-role-icon">${r?r.icon:'\u2753'}</div>
+      <div class="lb-name">${s.name}</div>
+      <div class="lb-pts">${s.points||0} pts</div>
+    </div>`;
+  }).join('');
+}
+
+/* =========================================================
+   VIEWS
+========================================================= */
+function landingView(){
+  return `
+  <div class="crest">\uD83C\uDFF0</div>
+  <div class="title-main">Knights of Emberfall II</div>
+  <div class="title-sub">The Two-Day Siege &mdash; a story game for reading, math &amp; logic</div>
+  <div class="choice-grid">
+    <div class="choice-card" id="pick-teacher">
+      <div class="icon">\uD83D\uDCD6</div>
+      <h3>I'm the Teacher</h3>
+      <p class="muted">Create a room and run the quest.</p>
+    </div>
+    <div class="choice-card" id="pick-student">
+      <div class="icon">\u2694\uFE0F</div>
+      <h3>I'm a Student</h3>
+      <p class="muted">Join with a room code.</p>
+    </div>
+  </div>`;
+}
+function teacherDashView(){
+  const chapter = CHAPTERS[game.chapterIndex];
+  const tabs = ['play','lines','roster','leaderboard'];
+  const tabLabels = {play:'\uD83C\uDFAE Play', lines:'\uD83D\uDCDC Assign Lines', roster:'\uD83D\uDC65 Roster', leaderboard:'\uD83C\uDFC6 Leaderboard'};
+  let body = '';
+  if(teacherDashTab==='play'){
+    body = `
+    <div class="row between">
+      <h3>Day ${chapter.day} &middot; ${chapter.block} Block</h3>
+      <select id="jump-chapter">
+        ${CHAPTERS.map((c,i)=>`<option value="${i}" ${i===game.chapterIndex?'selected':''}>Day ${c.day} &ndash; ${c.title}</option>`).join('')}
+      </select>
+    </div>
+    <div class="panel">${dragonTrackHTML(game.dragonLevel)}</div>
+    <div class="panel">
+      <h2>${chapter.title}</h2>
+      ${chapter.script.map((l,i)=>scriptLineHTML(l, i, game.chapterIndex, false)).join('')}
+      ${game.lastResult ? chapter.closing.map((l,i)=>scriptLineHTML(l, 1000+i, game.chapterIndex, false)).join('') : ''}
+      <div class="spacer"></div>
+      <div class="row">
+        ${!game.challengeActive && !game.lastResult ? `<button class="btn-primary" id="btn-trigger-challenge">Start the Challenge \u2192</button>` : ''}
+        ${game.lastResult ? `<button class="btn-gold" id="btn-next-chapter">${game.chapterIndex<CHAPTERS.length-1?'Next Chapter \u2192':'Finish the Siege \uD83C\uDFC1'}</button>` : ''}
+      </div>
+    </div>`;
+  } else if(teacherDashTab==='lines'){
+    body = `<div class="panel">
+      <h3>Assign Script Lines &mdash; ${chapter.title}</h3>
+      <p class="muted">Pick which student reads each line. Their screen will highlight it as "Your Line!"</p>
+      ${chapter.script.map((l,i)=>scriptLineHTML(l, i, game.chapterIndex, true)).join('')}
+    </div>`;
+  } else if(teacherDashTab==='roster'){
+    body = `<div class="panel">
+      <h3>Roster &mdash; Room ${roomCode}</h3>
+      <p class="muted">Share this code with students joining today.</p>
+      ${game.students.length===0?'<p class="muted">No students joined yet.</p>':game.students.map(s=>{
+        const r = roleById(s.roleId);
+        return `<div class="roster-card">
+          <span style="font-size:1.4rem;">${r?r.icon:'\u2753'}</span>
+          <strong>${s.name}</strong>
+          <span class="muted">${r?r.name:'choosing role...'}</span>
+          <span class="ui" style="margin-left:auto;font-weight:700;">${s.points||0} pts</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  } else if(teacherDashTab==='leaderboard'){
+    body = `<div class="panel"><h3>\uD83C\uDFC6 Leaderboard</h3>${leaderboardHTML()}</div>`;
+  }
+  return `
+  <div class="panel">
+    <div class="row between">
+      <div><div class="eyebrow">Room Code</div><div class="mono" style="font-size:1.6rem;font-weight:700;color:var(--crimson);">${roomCode}</div></div>
+      <div class="row">
+        <button class="btn-ghost btn-small" id="btn-pause">${game.paused?'\u25B6 Resume':'\u23F8 Pause'}</button>
+        <button class="btn-ghost btn-small" id="btn-reset">Reset Game</button>
+      </div>
+    </div>
+  </div>
+  ${game.paused?'<div class="pause-banner">\u23F8 Game Paused &mdash; students see a "waiting" screen. Resume anytime.</div>':''}
+  <div class="tab-bar">
+    ${tabs.map(t=>`<button class="tab-btn ${teacherDashTab===t?'active':''}" data-tab="${t}">${tabLabels[t]}</button>`).join('')}
+  </div>
+  ${body}
+  ${game.challengeActive ? challengeOverlay(true) : ''}
+  ${game.cardShown ? cardFlipOverlay() : ''}
+  `;
+}
+function studentJoinView(){
+  return `
+  <div class="panel" style="max-width:480px;margin:40px auto;">
+    <div class="crest">\uD83D\uDCDC</div>
+    <h2 class="center">Join the Quest</h2>
+    <label for="join-code">Room Code</label>
+    <input id="join-code" class="mono" placeholder="e.g. HVE-472" autocomplete="off">
+    <div class="spacer"></div>
+    <label for="join-name">Your Name</label>
+    <input id="join-name" placeholder="e.g. Jamie">
+    <div class="spacer"></div>
+    <button class="btn-primary" id="btn-do-join" style="width:100%;">Enter Emberfall \u2192</button>
+    <div class="spacer"></div>
+    <button class="btn-ghost btn-small" id="btn-back-landing">&larr; Back</button>
+  </div>`;
+}
+function studentRoleView(){
+  return `
+  <div class="panel">
+    <h2 class="center">Choose Your Role</h2>
+    <p class="center muted">Room: <span class="mono">${roomCode}</span> &middot; Player: <strong>${me.name}</strong></p>
+    <div class="role-grid">
+      ${ROLES.map(r=>{
+        const taken = game.students.find(s=>s.roleId===r.id);
+        return `<div class="role-card ${taken?'taken':''}" data-role="${r.id}">
+          ${taken?`<div class="taken-tag">${taken.name}</div>`:''}
+          <div class="r-icon">${r.icon}</div>
+          <div class="r-name">${r.name}</div>
+          <div class="r-title">${r.title}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+function studentMainView(){
+  if(game.paused){
+    return `<div class="panel center"><div class="crest">\u23F8</div><h2>The story pauses...</h2><p class="muted">Your teacher will resume the quest soon.</p></div>`;
+  }
+  const chapter = CHAPTERS[game.chapterIndex];
+  const myLineNums = Object.entries(game.lineAssignments[game.chapterIndex]||{})
+    .filter(([idx,name])=>name===me.name).map(([idx])=>parseInt(idx)+1);
+  return `
+  <div class="panel">
+    <div class="row between">
+      <div>${rolePillHTML(me.roleId)}</div>
+      <div class="muted">${me.name} &middot; Room ${roomCode}</div>
+    </div>
+  </div>
+  <div class="panel">${dragonTrackHTML(game.dragonLevel)}</div>
+  <div class="statusbar">
+    <div class="stat">\u2B50 My Points: <span class="v">${(studentByName(me.name)||{}).points||0}</span></div>
+    <div class="stat">\uD83D\uDCD6 Day ${chapter.day} &mdash; ${chapter.block} Block</div>
+  </div>
+  ${myLineNums.length ? `<div class="my-lines-banner">\u2B50 Your lines this chapter: ${myLineNums.join(', ')}</div>` : ''}
+  <div class="panel">
+    <div class="eyebrow">Chapter ${game.chapterIndex+1} of ${CHAPTERS.length}</div>
+    <h2>${chapter.title}</h2>
+    ${chapter.script.map((l,i)=>scriptLineHTML(l, i, game.chapterIndex, false)).join('')}
+    ${game.lastResult ? `
+      <div class="spacer"></div>
+      ${chapter.closing.map((l,i)=>scriptLineHTML(l, 1000+i, game.chapterIndex, false)).join('')}
+    ` : `<p class="muted center">Waiting for your teacher to start the next challenge...</p>`}
+  </div>
+  ${game.challengeActive ? challengeOverlay(false) : ''}
+  ${game.cardShown ? cardFlipOverlay() : ''}
+  `;
+}
+
+/* =========================================================
+   RENDER
+========================================================= */
+function render(){
+  const app = document.getElementById('app');
+  let html = '';
+  if(view==='landing') html = landingView();
+  else if(view==='teacher-dash') html = teacherDashView();
+  else if(view==='student-join') html = studentJoinView();
+  else if(view==='student-role') html = studentRoleView();
+  else if(view==='student-view') html = studentMainView();
+  app.innerHTML = html;
+  attachHandlers();
+}
+
+function attachHandlers(){
+  const $ = (id)=>document.getElementById(id);
+  const q = (sel)=>document.querySelectorAll(sel);
+
+  if($('pick-teacher')) $('pick-teacher').onclick = teacherCreateRoom;
+  if($('pick-student')) $('pick-student').onclick = ()=>{ view='student-join'; render(); };
+  if($('btn-back-landing')) $('btn-back-landing').onclick = ()=>{ view='landing'; render(); };
+
+  if($('btn-do-join')) $('btn-do-join').onclick = ()=>{
+    const rc = $('join-code').value.trim().toUpperCase();
+    const nm = $('join-name').value.trim();
+    if(!rc || !nm){ alert('Please enter both a room code and your name.'); return; }
+    studentJoinRoom(rc, nm);
+  };
+
+  q('.role-card').forEach(card=>{
+    if(card.classList.contains('taken')) return;
+    card.onclick = ()=> studentPickRole(card.dataset.role);
+  });
+
+  q('.tab-btn').forEach(btn=>{
+    btn.onclick = ()=>{ teacherDashTab = btn.dataset.tab; render(); };
+  });
+
+  q('.assign-select').forEach(sel=>{
+    sel.onchange = (e)=> assignLine(parseInt(sel.dataset.chapter), parseInt(sel.dataset.line), e.target.value);
+  });
+
+  if($('jump-chapter')) $('jump-chapter').onchange = (e)=> jumpToChapter(parseInt(e.target.value));
+  if($('btn-trigger-challenge')) $('btn-trigger-challenge').onclick = ()=>{ pickedChoiceIndex=null; triggerChallenge(); };
+  if($('btn-next-chapter')) $('btn-next-chapter').onclick = ()=>{ pickedChoiceIndex=null; advanceChapter(); };
+  if($('btn-pause')) $('btn-pause').onclick = togglePause;
+  if($('btn-reset')) $('btn-reset').onclick = resetGame;
+  if($('btn-dismiss-card')) $('btn-dismiss-card').onclick = ()=>{ game.cardShown=null; pushState(); };
+
+  q('[data-choice]').forEach(btn=>{
+    btn.onclick = ()=>{ pickedChoiceIndex = parseInt(btn.dataset.choice); render(); };
+  });
+  if($('btn-submit-choice')) $('btn-submit-choice').onclick = ()=>{
+    if(pickedChoiceIndex===null) return;
+    studentSubmit(String(pickedChoiceIndex));
+  };
+  if($('btn-submit-answer')) $('btn-submit-answer').onclick = ()=>{
+    const txt = $('student-answer').value.trim();
+    if(!txt){ alert('Please type an answer first.'); return; }
+    studentSubmit(txt);
+  };
+
+  q('[data-grade-correct]').forEach(btn=>{
+    btn.onclick = ()=> gradeSubmission(btn.dataset.gradeCorrect, true);
+  });
+  q('[data-grade-incorrect]').forEach(btn=>{
+    btn.onclick = ()=> gradeSubmission(btn.dataset.gradeIncorrect, false);
+  });
+}
+
+/* =========================================================
+   INIT
+========================================================= */
+render();
+</script>
+</body>
+</html>
